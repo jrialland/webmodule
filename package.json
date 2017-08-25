@@ -1,0 +1,53 @@
+{
+  "name": "webmodule",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1",
+    "vue": "^2.4.2",
+    "vue-router": "^2.7.0"
+  },
+  "scripts": {
+    "serve": "gulp serve"
+  },
+  "author": "",
+  "license": "ISC",
+  "aliasify": {
+    "aliases": {
+      "vue": "vue/dist/vue.js"
+    }
+  },
+  "devDependencies": {
+    "aliasify": "^2.1.0",
+    "babelify": "^7.3.0",
+    "browser-sync": "^2.18.13",
+    "chalk": "^2.1.0",
+    "envify": "^4.1.0",
+    "fs-sync": "^1.0.4",
+    "glob-promise": "^3.1.0",
+    "gulp": "^3.9.1",
+    "gulp-browserify": "^0.5.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-debug": "^3.1.0",
+    "gulp-jsbeautifier": "^2.1.1",
+    "gulp-karma": "0.0.5",
+    "gulp-nodeunit": "^0.1.0",
+    "gulp-sass": "^3.1.0",
+    "gulp-uglify": "^3.0.0",
+    "gulp-util": "^3.0.8",
+    "gulp-vueify": "0.0.3",
+    "hjson": "^3.1.0",
+    "jasmine-core": "^2.8.0",
+    "jshint": "^2.9.5",
+    "karma": "^0.13.22",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^1.1.0",
+    "nunjucks": "^3.0.1",
+    "rimraf": "^2.6.1",
+    "sass": "^1.0.0-beta.2",
+    "username": "^3.0.0",
+    "vueify-insert-css": "^1.0.0",
+    "yargs": "^8.0.2"
+  }
+}

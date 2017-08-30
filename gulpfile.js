@@ -8,6 +8,7 @@ const sass = require('gulp-sass');
 const prettify = require('gulp-jsbeautifier');
 const browserify = require('gulp-browserify');
 const uglify = require('gulp-uglify');
+const imagemin = require('gulp-imagemin');
 const nodeunit = require('gulp-nodeunit');
 
 const debug = require('gulp-debug');
@@ -188,6 +189,12 @@ gulp.task('uglify', ['sass', 'browserify', 'copy_assets'], function() {
     }
 });
 
+gulp.task('imagemin', function() {
+    return gulp.src('assets/images/**')
+           .pipe(imagemin())
+           .pipe(gulp.dest('dist/images'))
+});
+
 //remove dist directory
 gulp.task('clean', function() {
     const rimraf = require('rimraf');
@@ -197,7 +204,7 @@ gulp.task('clean', function() {
 });
 
 //create deployement-ready content in ./dist
-gulp.task('dist', ['sass', 'browserify', 'copy_assets', 'uglify']);
+gulp.task('dist', ['sass', 'browserify', 'copy_assets', 'uglify', 'imagemin']);
 
 //run a test server
 gulp.task('serve', ['dist'], function() {

@@ -1,7 +1,7 @@
 'use strict';
 const _ = require('lodash');
+const log = require('fancy-log');
 const gulp = require('gulp');
-const gulpUtil = require('gulp-util');
 const concat = require('gulp-concat');
 const sass = require('gulp-sass');
 //var sourcemaps = require('gulp-sourcemaps');
@@ -33,26 +33,6 @@ function date() {
     return '[' + chalk.gray(hour + ':' + min + ':' + sec) + ']';
 }
 
-function info(msg) {
-    console.warn(date() + ' ' + chalk.green('\u221A [INFO ] ' + msg));
-}
-
-function warn(msg) {
-    console.warn(date() + ' ' + chalk.yellow('~ [WARN ] ' + msg));
-}
-
-function err(msg) {
-    console.error(date() + ' ' + chalk.red('\u2716 [ERROR] ' + msg));
-}
-
-function fatal(msg) {
-    err(msg);
-    throw new gulpUtil.PluginError({
-        plugin: __filename,
-        message: msg
-    });
-}
-
 function log(msg) {
     gulpUtil.log(msg);
 }
@@ -66,7 +46,12 @@ function getConfig() {
         buildUser: require('username').sync(),
         buildHostname: require('os').hostname()
     }
-    var files = ['config/config.json', 'config/config.hjson', 'config/config-' + config.env + '.json', 'config/config-' + config.env + '.hjson'];
+    var files = [
+		'config/config.json',
+		'config/config.hjson',
+		'config/config-' + config.env + '.json',
+		'config/config-' + config.env + '.hjson'
+	];
     for(var i = 0; i < files.length; i++) {
         if(fs.exists(files[i])) {
             if(files[i].endsWith('hjson')) {
@@ -80,20 +65,13 @@ function getConfig() {
     return config;
 }
 /*----------------------------------------------------------------------------*/
-/* read configuration                                                          */
+/* read configuration                                                         */
 /*----------------------------------------------------------------------------*/
 const config = getConfig();
 
 /*----------------------------------------------------------------------------*/
 /* Tasks                                                                      */
 /*----------------------------------------------------------------------------*/
-
-
-gulp.task('showconf', function() {
-    return new Promise(function(accept, reject) {
-        console.log(config);
-    });
-});
 
 //beautify scripts
 gulp.task('prettify', function() {
@@ -111,15 +89,23 @@ gulp.task('sass', function() {
     })).pipe(gulp.dest("dist")).pipe(browserSync.stream());
 });
 
+//generate a config file 
 gulp.task('make_conf_js', function() {
     return new Promise(function(accept, reject) {
         var confJs = 'window.config = ' + JSON.stringify(config) + ';';
         fs.write('dist/js/config.js', confJs);
-        info("created 'dist/js/config.js'");
+        log.info("created 'dist/js/config.js'");
         browserSync.reload()
         accept();
     });
 
+});
+
+//show current configuration
+gulp.task('showconf', function() {
+    return new Promise(function(accept, reject) {
+        console.log(config);
+    });
 });
 
 //make the project browser-ready
@@ -151,7 +137,7 @@ gulp.task('copy_ext_assets', function() {
     return Promise.all(promises);
 });
 
-
+//html templating
 gulp.task('nunjucks', function() {
     const nunjucks = require('nunjucks');
     return new Promise(function(accept, reject) {
@@ -162,7 +148,7 @@ gulp.task('nunjucks', function() {
                     if(!inputfile.endsWith('.vue.html')) {
                         var outputfile = files[i].replace(/^assets/, 'dist');
                         var res = nunjucks.render(files[i], config);
-                        info('nunjucks ' + inputfile + ' -> ' + outputfile);
+                        log.info('nunjucks ' + inputfile + ' -> ' + outputfile);
                         fs.write(outputfile, res);
                     }
                 }
@@ -185,7 +171,7 @@ gulp.task('uglify', ['sass', 'browserify', 'copy_assets'], function() {
     if(config.uglify ||  config.env !== 'dev') {
         return gulp.src('dist/js/app.js').pipe(uglify()).pipe(gulp.dest('dist'));
     } else {
-        warn("uglify is disabled for env == 'dev' unless --uglify=true flag is set");
+        log.warn("uglify is disabled for env == 'dev' unless --uglify=true flag is set");
     }
 });
 
@@ -217,35 +203,31 @@ gulp.task('serve', ['dist'], function() {
     gulp.watch("assets/**/*", ['copy_assets']);
 });
 
+// end-to-end tests
 gulp.task('e2e', function(cb) {
-
     if(!config.skipTests) {
-
         var Server = require('karma').Server;
         new Server({
             configFile: __dirname + '/config/karma.conf.js',
             singleRun: true
         }, cb).start();
-
     } else {
-        warn('unit tests are skipped');
+        log.warn('unit tests are skipped');
         return null;
     }
-
 });
 
 //node-based (non-browser) unit tests
 gulp.task('unittest', function() {
     return gulp.src('test/**/*.unittest.js').pipe(nodeunit(
-    /*{
+    {
                  reporter:'junit',
                  reporterOptions : {
                      output: 'testreport'
                  }
-             }*/
+             }
     ));
 });
 
-//todo : normal (non-browser) unit tests using mocha
 //todo : ievms integration (tests on IE)
 //todo : cucumber reports
